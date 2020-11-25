@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import dotwerk
+import dotwerke
 import os
 
 
-class Clean(dotwerk.Plugin):
+class Clean(dotwerke.Plugin):
     """
     Core plugin to clean broken symbolic links.
     """

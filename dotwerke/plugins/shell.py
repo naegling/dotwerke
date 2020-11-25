@@ -2,10 +2,10 @@
 
 import os
 import subprocess
-import dotwerk
+import dotwerke
 
 
-class Shell(dotwerk.Plugin):
+class Shell(dotwerke.Plugin):
     """
     Core plugin to run arbitrary shell commands.
     """

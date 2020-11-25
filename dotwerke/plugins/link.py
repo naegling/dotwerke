@@ -2,11 +2,11 @@
 
 import os
 import shutil
-import dotwerk
+import dotwerke
 from socket import gethostname
 
 
-class Link(dotwerk.Plugin):
+class Link(dotwerke.Plugin):
     """
     Core plugin to symbolically link dotfiles.
     """
