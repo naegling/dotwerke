@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import snowsaw
+import dotwerk
 import os
 
 
-class Clean(snowsaw.Plugin):
+class Clean(dotwerk.Plugin):
     """
     Core plugin to clean broken symbolic links.
     """

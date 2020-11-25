@@ -3,13 +3,13 @@
 from distutils.core import setup
 
 setup(
-    name='snowsaw',
-    version='0.2.0',
+    name='dotwerk',
+    version='0.0.0',
     packages=['', 'util', 'logging'],
-    package_dir={'': 'snowsaw'},
-    url='https://github.com/arcticicestudio/snowsaw',
+    package_dir={'': 'dotwerk'},
+    url='https://github.com/naegling/dotwerk',
     license='MIT',
-    author='Arctic Ice Studio',
-    author_email='development@arcticicestudio.com',
+    author='',
+    author_email='',
     description='A lightweight, plugin-driven and simple configurable dotfile bootstrapper.'
 )

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-The snowsaw CLI.
+The dotwerk CLI.
 
 This is the main entry point of the public API.
 """

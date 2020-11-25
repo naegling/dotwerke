@@ -2,11 +2,11 @@
 
 import os
 import shutil
-import snowsaw
+import dotwerk
 from socket import gethostname
 
 
-class Link(snowsaw.Plugin):
+class Link(dotwerk.Plugin):
     """
     Core plugin to symbolically link dotfiles.
     """

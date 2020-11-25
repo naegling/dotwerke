@@ -2,10 +2,10 @@
 
 import os
 import subprocess
-import snowsaw
+import dotwerk
 
 
-class Shell(snowsaw.Plugin):
+class Shell(dotwerk.Plugin):
     """
     Core plugin to run arbitrary shell commands.
     """
