@@ -4,22 +4,22 @@ import copy
 
 
 class Context(object):
-    """
-    Contextual data and information for plugins
-    """
-    def __init__(self, snowblock_dir):
-        self._snowblock_dir = snowblock_dir
-        self._defaults = {}
-        pass
+  """
+  Contextual data and information for plugins
+  """
+  def __init__(self, dir):
+    self._dir = dir
+    self._defaults = {}
+    pass
 
-    def set_snowblock_dir(self, snowblock_dir):
-        self._snowblock_dir = snowblock_dir
+  def set_dir(self, dir):
+    self._dir = dir
 
-    def snowblock_dir(self):
-        return self._snowblock_dir
+  def dir(self):
+    return self._dir
 
-    def set_defaults(self, defaults):
-        self._defaults = defaults
+  def set_defaults(self, defaults):
+    self._defaults = defaults
 
-    def defaults(self):
-        return copy.deepcopy(self._defaults)
+  def defaults(self):
+    return copy.deepcopy(self._defaults)
