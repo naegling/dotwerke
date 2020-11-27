@@ -26,8 +26,8 @@ def add_options(parser):
   parser.add_argument('-Q', '--super-quiet', action='store_true', help='suppress almost all output')
   parser.add_argument('-q', '--quiet', action='store_true', help='suppress most output')
   parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output')
-  parser.add_argument('-b', '--base-directory', default='.', dest='base', help='base directory of dotfiles repository (default=\'.\')', metavar='BASEDIR')
-  parser.add_argument('-c', '--config-file', nargs='*', dest='config_files', help='dotwerke package configurations, relative to base (default=all)', metavar='CONFIGFILE')
+  parser.add_argument('-b', '--base-directory', default='.', dest='base', help='base directory of dotfiles repository (default=\'.\')', metavar='BASE_DIR')
+  parser.add_argument('configs', nargs='*', help='dotwerke package configurations, relative to base (default=all)', metavar='PACKAGE_DIR')
   parser.add_argument('-p', '--plugin', action='append', dest='plugins', default=[], help='load PLUGIN as a plugin', metavar='PLUGIN')
   parser.add_argument('--disable-core-plugins', action='store_true', help='disable all core plugins')
   parser.add_argument('--plugin-dir', action='append', dest='plugin_dirs', default=[], metavar='PLUGIN_DIR', help='load all plugins in PLUGIN_DIR')
@@ -44,7 +44,7 @@ def read_config(config_file):
   return reader.get_config()
 
 
-def find_configs(base, filename):
+def find_configs(base, filenames):
   """
   finds list of dotwerke configuration files
 
@@ -54,8 +54,9 @@ def find_configs(base, filename):
   """
   result = []
   for root, subs, files in os.walk(base):
-    if filename in files:
-      result.append(root)
+    for file in filenames:
+      if file in files:
+        result.append(os.path.join(root, file))
   return result
 
 
@@ -67,7 +68,7 @@ def main():
   """
   log = Logger()
   try:
-    cfg_filename = 'dotwerke.json'
+    cfg_filenames = ['dotwerke.yaml', 'dotwerke.json']
     parser = ArgumentParser()
     add_options(parser)
     options = parser.parse_args()
@@ -93,36 +94,40 @@ def main():
       module.load(abspath)
 
     configs = []
-    if options.config_files is None or len(options.config_files) == 0:
-      configs.extend(find_configs(options.base, cfg_filename))
+    if options.configs is None or len(options.configs) == 0:
+      configs.extend(find_configs(options.base, cfg_filenames))
     else:
-      for cfg in options.config_files:
-        if os.path.isfile(os.path.join(options.base, cfg, cfg_filename)):
-          configs.append(cfg)
-        else:
-          log.lowinfo("dotwerke configuration file in \"{}\" not found".format(cfg))
+      for cfg in options.configs:
+        found = False
+        for file in cfg_filenames:
+          if os.path.isfile(os.path.join(options.base, cfg, file)):
+            configs.append(os.path.join(cfg, file))
+            found = True
+            break
+        if not found:
+          log.warning("dotwerke configuration file in \'{}\' not found".format(cfg))
 
     if len(configs) == 0:
-      log.error("no dotwerke configuration files found")
+      log.error("dotwerke configuration files not found")
       exit(1)
 
     for cfg in configs:
       log.info("running {}".format(cfg))
-      tasks = read_config(os.path.join(options.base, cfg, cfg_filename))
+      tasks = read_config(os.path.join(options.base, cfg))
 
       if not isinstance(tasks, list):
         raise ReadingError("Failed to read configuration file \"{}\"".format(cfg))
 
-      dispatcher = Dispatcher(os.path.join(options.base_directory, cfg))
+      dispatcher = Dispatcher(os.path.join(options.base, os.path.split(cfg)[0]))
       success = dispatcher.dispatch(tasks)
       if success:
-        log.info("==> All tasks succeeded\n")
+        log.info("All tasks succeeded")
       else:
-        raise DispatchError("\n==> Some tasks failed")
+        raise DispatchError("Some tasks failed")
 
   except (ReadingError, DispatchError) as e:
     log.error("{}".format(e))
     exit(1)
   except KeyboardInterrupt:
-    log.error("\n==> Operation aborted")
+    log.error("Operation aborted")
     exit(1)

@@ -10,10 +10,10 @@ class Clean(dotwerke.Plugin):
   """
   _directive = "clean"
 
-  def can_handle(self, directive):
-    return directive == self._directive
+  def get_actions(self):
+    return [self._directive]
 
-  def handle(self, directive, data):
+  def do_handle(self, directive, data):
     if directive != self._directive:
       raise ValueError("Core plugin \"Clean\" cannot handle the directive \"{}\"".format(directive))
     return self._process_clean(data)
@@ -29,14 +29,14 @@ class Clean(dotwerke.Plugin):
     for target in targets:
       success &= self._clean(target)
     if success:
-      self._log.info("=> All targets have been cleaned")
+      self._log.info("All targets have been cleaned")
     else:
       self._log.error("Some targets were not successfully cleaned")
     return success
 
   def _clean(self, target):
     """
-    Cleans all broken symbolic links in the specified target that point to a subdirectory of the snowblocks directory.
+    Cleans all broken symbolic links in the specified target that point to a subdirectory of the package directory.
 
     :param target: The target to clean
     :return: True if cleaned successfully
@@ -47,7 +47,7 @@ class Clean(dotwerke.Plugin):
     for item in os.listdir(os.path.expanduser(target)):
       path = os.path.join(os.path.expanduser(target), item)
       if not os.path.exists(path) and os.path.islink(path):
-        if self._in_directory(path, self._context.snowblock_dir()):
+        if self._in_directory(path, self._context.dir()):
           self._log.lowinfo("Removing invalid link {} -> {}".format(path, os.path.join(os.path.dirname(path), os.readlink(path))))
           os.remove(path)
     return True

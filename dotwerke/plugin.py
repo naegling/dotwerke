@@ -12,16 +12,15 @@ class Plugin(object):
     self._context = context
     self._log = Logger()
 
-  def can_handle(self, directive):
+  def get_actions(self):
     """
-    Checks if the plugin can handle the specified directive.
+    Returns a list of actions handled by this pluggin.
 
-    :param directive: The directive to check
-    :return: True if the specified directive can be handled, False otherwise
+    :return: List of actions
     """
     raise NotImplementedError
 
-  def handle(self, directive, data):
+  def do_handle(self, action, data):
     """
     Handles the data of the specified directive.
 

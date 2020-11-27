@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from socket import gethostname
+import platform
 import copy
 
 
@@ -10,13 +12,20 @@ class Context(object):
   def __init__(self, dir):
     self._dir = dir
     self._defaults = {}
-    pass
+    self._hostname = gethostname()
+    self._platform = platform.system()
 
   def set_dir(self, dir):
     self._dir = dir
 
   def dir(self):
     return self._dir
+
+  def get_hostname(self):
+    return self._hostname
+
+  def get_platform(self):
+    return self._platform
 
   def set_defaults(self, defaults):
     self._defaults = defaults

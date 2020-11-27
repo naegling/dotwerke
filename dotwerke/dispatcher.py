@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from typing import DefaultDict
 from .plugin import Plugin
 from .logging import Logger
 from .context import Context
@@ -41,13 +42,12 @@ class Dispatcher(object):
         if action == "defaults":
           self._context.set_defaults(task[action])
           handled = True
-        for plugin in self._plugins:
-          if plugin.can_handle(action):
-            try:
-              success &= plugin.handle(action, task[action])
-              handled = True
-            except Exception:
-              self._log.error("An error was encountered while executing action \"{}\"".format(action))
+        for plugin in self._plugins[action]:
+          try:
+            success &= plugin.do_handle(action, task[action])
+            handled = True
+          except Exception:
+            self._log.error("An error was encountered while executing action \"{}\"".format(action))
         if not handled:
           success = False
           self._log.error("Action \"{}\" not handled".format(action))
@@ -59,7 +59,10 @@ class Dispatcher(object):
 
     :return: None
     """
-    self._plugins = [plugin(self._context) for plugin in Plugin.__subclasses__()]
+    self._plugins = DefaultDict(lambda:[])
+    for plugin in [plugin(self._context) for plugin in Plugin.__subclasses__()]:
+      for action in plugin.get_actions():
+        self._plugins[action].append(plugin)
 
 
 class DispatchError(Exception):

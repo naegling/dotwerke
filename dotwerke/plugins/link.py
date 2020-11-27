@@ -12,10 +12,10 @@ class Link(dotwerke.Plugin):
   """
   _directive = "link"
 
-  def can_handle(self, directive):
-    return directive == self._directive
+  def get_actions(self):
+    return [self._directive]
 
-  def handle(self, directive, data):
+  def do_handle(self, directive, data):
     if directive != self._directive:
       raise ValueError("Core plugin \"Link\" cannot handle the directive \"{}\"".format(directive))
     return self._process_links(data)
@@ -29,14 +29,16 @@ class Link(dotwerke.Plugin):
     """
     success = True
     defaults = self._context.defaults().get("link", {})
-    hostname = gethostname()
+    hostname = self._context.get_hostname()
+    platform = self._context.get_platform()
     for destination, source in links.items():
       destination = os.path.expandvars(destination)
-      relative = defaults.get("relative", False)
+      relative = defaults.get("relative", True)
       force = defaults.get("force", False)
-      relink = defaults.get("relink", False)
-      create = defaults.get("create", False)
+      relink = defaults.get("relink", True)
+      create = defaults.get("create", True)
       hosts = defaults.get("hosts", {})
+      platforms = defaults.get("platforms", {})
       if isinstance(source, dict):
         relative = source.get("relative", relative)
         force = source.get("force", force)
@@ -44,22 +46,27 @@ class Link(dotwerke.Plugin):
         create = source.get("create", create)
         path = self._default_source(destination, source.get("path"))
         hosts = source.get("hosts", hosts)
+        platforms = source.get("platforms", platforms)
       else:
         path = self._default_source(destination, source)
       path = os.path.expandvars(os.path.expanduser(path))
+
+      if platforms:
+        if platform not in platforms:
+          self._log.lowinfo("Skipped host specific link {} on {}".format(destination, platform))
+          return True
 
       if hosts:
         if hostname in hosts:
           path = os.path.expandvars(os.path.expanduser(hosts.get(hostname)))
         elif "-" in hosts:
           path = os.path.expandvars(os.path.expanduser(hosts.get("-")))
-          self._log.lowinfo("Applying default link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(),path)))
+          self._log.lowinfo("Applying default link {} -> {}".format(destination, os.path.join(self._context.dir(),path)))
         else:
-          for host in hosts.items():
-            self._log.lowinfo("Skipped host specific link {} -> {}".format(destination, os.path.join(self._context.snowblock_dir(), host[1])))
+          self._log.lowinfo("Skipped host specific link {} on {}".format(destination, hostname))
           return True
 
-      if not self._exists(os.path.join(self._context.snowblock_dir(), path)):
+      if not self._exists(os.path.join(self._context.dir(), path)):
         success = False
         self._log.warning("Nonexistent target {} -> {}".format(destination, path))
         continue
@@ -69,7 +76,7 @@ class Link(dotwerke.Plugin):
         success &= self._delete(path, destination, relative, force)
       success &= self._link(path, destination, relative)
     if success:
-      self._log.info("=> All links have been set up")
+      self._log.info("All links have been set up")
     else:
       self._log.error("Some links were not successfully set up")
     return success
@@ -88,11 +95,7 @@ class Link(dotwerke.Plugin):
     :return: The source string
     """
     if source is None:
-      basename = os.path.basename(destination)
-      if basename.startswith('.'):
-        return basename[1:]
-      else:
-        return basename
+      return os.path.basename(destination).lstrip('.')
     else:
       return source
 
@@ -155,7 +158,7 @@ class Link(dotwerke.Plugin):
     :return: True if the path has been deleted successfully, False otherwise
     """
     success = True
-    source = os.path.join(self._context.snowblock_dir(), source)
+    source = os.path.join(self._context.dir(), source)
     fullpath = os.path.expanduser(path)
     if relative:
       source = self._relative_path(source, fullpath)
@@ -201,7 +204,7 @@ class Link(dotwerke.Plugin):
     """
     success = False
     destination = os.path.expanduser(link_name)
-    absolute_source = os.path.join(self._context.snowblock_dir(), source)
+    absolute_source = os.path.join(self._context.dir(), source)
     if relative:
       source = self._relative_path(absolute_source, destination)
     else:

@@ -13,7 +13,7 @@ class Logger(with_metaclass(Singleton, object)):
   """
   A custom logging class with level color support.
   """
-  def __init__(self, level=Level.LOWINFO):
+  def __init__(self, level=Level.WARNING):
     self.set_level(level)
 
   def set_level(self, level):

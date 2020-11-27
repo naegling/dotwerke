@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import json
 import os.path
 
 
@@ -20,8 +19,13 @@ class ConfigReader(object):
     """
     try:
       _, ext = os.path.splitext(config_file_path)
-      with open(config_file_path) as fin:
-        data = json.load(fin)
+      with open(config_file_path) as infile:
+        if ext == ".yaml":
+          import yaml
+          data = yaml.load(infile, Loader=yaml.FullLoader)
+        else:  
+          import json
+          data = json.load(infile)
         return data
     except Exception as e:
       raise ReadingError('Could not read config file:\n{}'.format(e))

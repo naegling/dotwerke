@@ -1,0 +1,5 @@
+- clean:
+  - "~/.config/test-package"
+- link:
+    "~/.config/test-package/.deleteme1":
+    "~/.config/test-package/.deleteme2":

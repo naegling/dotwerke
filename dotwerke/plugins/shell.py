@@ -11,10 +11,10 @@ class Shell(dotwerke.Plugin):
   """
   _directive = "shell"
 
-  def can_handle(self, directive):
-    return directive == self._directive
+  def get_actions(self):
+    return [self._directive]
 
-  def handle(self, directive, data):
+  def d0_handle(self, directive, data):
     if directive != self._directive:
       raise ValueError("Core plugin \"Shell\" cannot handle the directive \"{}\"".format(directive))
     return self._process_commands(data)
@@ -51,12 +51,12 @@ class Shell(dotwerke.Plugin):
         else:
           self._log.lowinfo('{} [{}]'.format(msg, cmd))
         executable = os.environ.get("SHELL")
-        ret = subprocess.call(cmd, shell=True, stdin=stdin, stdout=stdout, stderr=stderr, cwd=self._context.snowblock_dir(), executable=executable)
+        ret = subprocess.call(cmd, shell=True, stdin=stdin, stdout=stdout, stderr=stderr, cwd=self._context.dir(), executable=executable)
         if ret != 0:
           success = False
           self._log.warning("Command [{}] failed".format(cmd))
     if success:
-      self._log.info("=> All commands have been executed")
+      self._log.info("All commands have been executed")
     else:
       self._log.error("Some commands were not successfully executed")
     return success
