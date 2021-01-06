@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from typing import DefaultDict
+from collections import defaultdict
 from .plugin import Plugin
 from .logging import Logger
 from .context import Context
@@ -59,7 +59,7 @@ class Dispatcher(object):
 
     :return: None
     """
-    self._plugins = DefaultDict(lambda:[])
+    self._plugins = defaultdict(lambda:[])
     for plugin in [plugin(self._context) for plugin in Plugin.__subclasses__()]:
       for action in plugin.get_actions():
         self._plugins[action].append(plugin)
