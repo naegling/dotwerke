@@ -14,7 +14,7 @@ class Shell(dotwerke.Plugin):
   def get_actions(self):
     return [self._directive]
 
-  def d0_handle(self, directive, data):
+  def do_handle(self, directive, data):
     if directive != self._directive:
       raise ValueError("Core plugin \"Shell\" cannot handle the directive \"{}\"".format(directive))
     return self._process_commands(data)
