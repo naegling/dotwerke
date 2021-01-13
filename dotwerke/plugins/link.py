@@ -28,7 +28,8 @@ class Link(dotwerke.Plugin):
     :return: True if the links have been processed successfully, False otherwise
     """
     success = True
-    defaults = self._context.defaults().get("link", {})
+    # defaults = self._context.defaults().get("link", {})
+    defaults = self._context.defaults()
     hostname = self._context.get_hostname()
     platform = self._context.get_platform()
     for destination, source in links.items():
@@ -58,9 +59,13 @@ class Link(dotwerke.Plugin):
 
       if hosts:
         if hostname in hosts:
-          path = os.path.expandvars(os.path.expanduser(hosts.get(hostname)))
+          override_path = hosts.get(hostname)
+          if override_path is not None:
+            path = os.path.expandvars(os.path.expanduser(override_path))
         elif "-" in hosts:
-          path = os.path.expandvars(os.path.expanduser(hosts.get("-")))
+          override_path = hosts.get("-")
+          if override_path is not None:
+            path = os.path.expandvars(os.path.expanduser(override_path))
           self._log.lowinfo("Applying default link {} -> {}".format(destination, os.path.join(self._context.dir(),path)))
         else:
           self._log.lowinfo("Skipped host specific link {} on {}".format(destination, hostname))

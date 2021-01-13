@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "bin/dotwerke",
             "console": "integratedTerminal",
-            "args" : [],
+            "args" : ["-b", "~/dotfiles/pam-mount"],
             "cwd" : "${workspaceFolder}"
         }
     ]
