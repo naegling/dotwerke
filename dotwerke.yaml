@@ -1,4 +1,0 @@
-- clean:
-  - "~/.local/bin"
-- link:
-    "~/.local/bin/dotwerke": "bin/dotwerke"
