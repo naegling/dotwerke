@@ -65,10 +65,10 @@ def main():
   Processes all parsed options and hands it over to the dispatcher for each package configuration.
 
   :return: True if all tasks have been executed successfully, False otherwise
-  """
+team  """
   log = Logger()
   try:
-    cfg_filenames = ['dotwerke.yaml', 'dotwerke.json']
+    cfg_filenames = ['dotwerke.json']
     parser = ArgumentParser()
     add_options(parser)
     options = parser.parse_args()

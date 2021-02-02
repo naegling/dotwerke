@@ -38,8 +38,8 @@ class Link(dotwerke.Plugin):
       force = defaults.get("force", False)
       relink = defaults.get("relink", True)
       create = defaults.get("create", True)
-      hosts = defaults.get("hosts", {})
-      platforms = defaults.get("platforms", {})
+      hosts = defaults.get("hosts", None)
+      platforms = defaults.get("platforms", None)
       if isinstance(source, dict):
         relative = source.get("relative", relative)
         force = source.get("force", force)
@@ -52,24 +52,19 @@ class Link(dotwerke.Plugin):
         path = self._default_source(destination, source)
       path = os.path.expandvars(os.path.expanduser(path))
 
-      if platforms:
-        if platform not in platforms:
-          self._log.lowinfo("Skipped host specific link {} on {}".format(destination, platform))
-          return True
+      # convert to list, if spec'd as string
+      if isinstance(hosts, str):
+        hosts = [hosts]
+      if isinstance(platforms, str):
+        platforms = [platforms]
 
-      if hosts:
-        if hostname in hosts:
-          override_path = hosts.get(hostname)
-          if override_path is not None:
-            path = os.path.expandvars(os.path.expanduser(override_path))
-        elif "-" in hosts:
-          override_path = hosts.get("-")
-          if override_path is not None:
-            path = os.path.expandvars(os.path.expanduser(override_path))
-          self._log.lowinfo("Applying default link {} -> {}".format(destination, os.path.join(self._context.dir(),path)))
-        else:
-          self._log.lowinfo("Skipped host specific link {} on {}".format(destination, hostname))
-          return True
+      if platforms and platform not in platforms:
+        self._log.lowinfo("Skipped platform specific link {} on {}".format(destination, platform))
+        return True
+
+      if hosts and hostname not in hosts:
+        self._log.lowinfo("Skipped host specific link {} on {}".format(destination, hostname))
+        return True
 
       if not self._exists(os.path.join(self._context.dir(), path)):
         success = False
@@ -100,9 +95,16 @@ class Link(dotwerke.Plugin):
     :return: The source string
     """
     if source is None:
-      return os.path.basename(destination).lstrip('.')
-    else:
-      return source
+      root = self._context.dir()
+      platform = self._context.get_platform()
+      hostname = self._context.get_hostname()
+      basename = os.path.basename(destination).lstrip('.')
+      source = platform + "-" + basename
+      if not self._exists(source):
+        source = hostname + "-" + basename
+        if not self._exists(source):
+          source = basename
+    return source
 
   def _is_link(self, path):
     """

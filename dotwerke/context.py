@@ -5,6 +5,8 @@ import platform
 import copy
 
 
+PLATFORM_ABBR = { 'linux' : 'lnx', 'darwin' : 'osx'}
+
 class Context(object):
   """
   Contextual data and information for plugins
@@ -12,8 +14,11 @@ class Context(object):
   def __init__(self, dir):
     self._dir = dir
     self._defaults = {}
-    self._hostname = gethostname()
-    self._platform = platform.system()
+    self._hostname = gethostname().lower()
+    self._platform = platform.system().lower()
+    if self._platform in PLATFORM_ABBR:
+      self._platform = PLATFORM_ABBR[self._platform]
+
 
   def set_dir(self, dir):
     self._dir = dir
