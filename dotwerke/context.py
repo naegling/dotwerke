@@ -5,7 +5,7 @@ import platform
 import copy
 
 
-PLATFORM_ABBR = { 'linux' : 'lnx', 'darwin' : 'osx'}
+PLATFORM_ABBR = { 'linux' : 'lnx', 'darwin' : 'osx', 'FreeBSD': 'bsd', "Minux" : "mnx"}
 
 class Context(object):
   """
