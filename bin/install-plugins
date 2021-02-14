@@ -29,11 +29,7 @@ def main(args):
       installed.add(dir)
 
   configured = set(plugins.keys())
-  untracked = installed.difference(configured)
   missing = configured.difference(installed)
-
-  if len(untracked) > 0:
-    print("untracked zsh-plugins:", ", ".join(untracked))
 
   if len(missing) > 0:
     print("installing missing plugins")
@@ -41,6 +37,11 @@ def main(args):
     for name in missing:
       args = ['git', 'clone', plugins[name]]
       subprocess.run(args)
+
+  if not args.silent:
+    untracked = installed.difference(configured)
+    if len(untracked) > 0:
+      print("untracked zsh-plugins:", ", ".join(untracked))
 
   return ret_code
 
@@ -51,5 +52,6 @@ if __name__ == "__main__":
   parser.add_argument("--plugins", required=True, help='file containing list of plugins')
   parser.add_argument("--home", required=True, help='directory for plugin installation')
   parser.add_argument("--ignore", nargs='*', help='directory for plugin installation')
+  parser.add_argument("--silent", action='store_true', default=False, help='do not warn if untracked plugins are found')
   args = parser.parse_args()
   exit(main(args))
