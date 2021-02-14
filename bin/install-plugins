@@ -15,7 +15,7 @@ def main(args):
   elif not os.path.isfile(args.plugins):
     print("unable to find file containing plugin list:", args.plugins)
   else:
-    ignored = set(args.ignored)
+    ignored = set(args.ignore)
     plugins = {}
     with open(args.plugins) as infile:
       for line in infile:
