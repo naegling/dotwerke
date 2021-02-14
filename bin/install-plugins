@@ -51,7 +51,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='automatically clones plugins (e.g. for zsh, tmux)')
   parser.add_argument("--plugins", required=True, help='file containing list of plugins')
   parser.add_argument("--home", required=True, help='directory for plugin installation')
-  parser.add_argument("--ignore", nargs='*', help='directory for plugin installation')
+  parser.add_argument("--ignore", nargs='*', default=[], help='directory for plugin installation')
   parser.add_argument("--silent", action='store_true', default=False, help='do not warn if untracked plugins are found')
   args = parser.parse_args()
   exit(main(args))
