@@ -4,7 +4,7 @@
   },
   {
     "link": {
-      "~/.local/bin/dotwerke": "bin/dotwerke"
+      "~/.local/bin/dotwerke": "bin/dotwerke",
       "~/.local/bin/install-plugins": "bin/install-plugins"
     }
   }
