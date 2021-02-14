@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import os
+import sys
+from urllib.parse import urlparse
+import subprocess
+
+def main(args):
+
+  ret_code = 1
+  if not os.path.isdir(args.home):
+    print("unable to find directory for plugin installation:", args.home)
+  elif not os.path.isfile(args.plugins):
+    print("unable to find file containing plugin list:", args.plugins)
+  else:
+    ignored = set(args.ignored)
+    plugins = {}
+    with open(args.plugins) as infile:
+      for line in infile:
+        repo = line.split('#')[0].strip()
+        if len(repo) > 0:
+          name = os.path.splitext(os.path.basename(urlparse(repo).path))[0]
+          plugins[name] = repo
+  installed = set()
+  for dir in os.listdir(args.home):
+    if dir not in ignored and os.path.isdir(os.path.join(args.home, dir)):
+      installed.add(dir)
+
+  configured = set(plugins.keys())
+  untracked = installed.difference(configured)
+  missing = configured.difference(installed)
+
+  if len(untracked) > 0:
+    print("untracked zsh-plugins:", ", ".join(untracked))
+
+  if len(missing) > 0:
+    print("installing missing plugins")
+    os.chdir(args.home)
+    for name in missing:
+      args = ['git', 'clone', plugins[name]]
+      subprocess.run(args)
+
+  return ret_code
+
+
+if __name__ == "__main__":
+
+  parser = argparse.ArgumentParser(description='automatically clones plugins (e.g. for zsh, tmux)')
+  parser.add_argument("--plugins", required=True, help='file containing list of plugins')
+  parser.add_argument("--home", required=True, help='directory for plugin installation')
+  parser.add_argument("--ignore", nargs='*', help='directory for plugin installation')
+  args = parser.parse_args()
+  exit(main(args))
