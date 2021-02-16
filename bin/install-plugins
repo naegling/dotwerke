@@ -21,7 +21,10 @@ def main(args):
       for line in infile:
         repo = line.split('#')[0].strip()
         if len(repo) > 0:
-          name = os.path.splitext(os.path.basename(urlparse(repo).path))[0]
+          if '|' in repo:
+            repo, name = repo.split('|', 1)
+          else:
+            name = os.path.splitext(os.path.basename(urlparse(repo).path))[0]
           plugins[name] = repo
   installed = set()
   for dir in os.listdir(args.home):
