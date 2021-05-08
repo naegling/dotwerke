@@ -27,6 +27,7 @@ def add_options(parser):
   parser.add_argument('-q', '--quiet', action='store_true', help='suppress most output')
   parser.add_argument('-v', '--verbose', action='store_true', help='enable verbose output')
   parser.add_argument('-b', '--base-directory', default='.', dest='base', help='base directory of dotfiles repository (default=\'.\')', metavar='BASE_DIR')
+  parser.add_argument('-f', '--force', action='store_true', help='add force option to all tasks')
   parser.add_argument('configs', nargs='*', help='dotwerke package configurations, relative to base (default=all)', metavar='PACKAGE_DIR')
   parser.add_argument('-p', '--plugin', action='append', dest='plugins', default=[], help='load PLUGIN as a plugin', metavar='PLUGIN')
   parser.add_argument('--disable-core-plugins', action='store_true', help='disable all core plugins')
@@ -118,12 +119,12 @@ team  """
       if not isinstance(tasks, list):
         raise ReadingError("Failed to read configuration file \"{}\"".format(cfg))
 
-      dispatcher = Dispatcher(os.path.join(options.base, os.path.split(cfg)[0]))
+      dispatcher = Dispatcher(os.path.join(options.base, os.path.split(cfg)[0]), options.force)
       success = dispatcher.dispatch(tasks)
       if success:
         log.info("All tasks succeeded")
       else:
-        raise DispatchError("Some tasks failed")
+        log.error("At least one test failed, \'{0}\'".format(cfg))
 
   except (ReadingError, DispatchError) as e:
     log.error("{}".format(e))

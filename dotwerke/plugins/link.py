@@ -35,7 +35,7 @@ class Link(dotwerke.Plugin):
     for destination, source in links.items():
       destination = os.path.expandvars(destination)
       relative = defaults.get("relative", True)
-      force = defaults.get("force", False)
+      force = defaults.get("force", self.force)
       relink = defaults.get("relink", True)
       create = defaults.get("create", True)
       hosts = defaults.get("hosts", None)

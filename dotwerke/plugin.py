@@ -8,9 +8,10 @@ class Plugin(object):
   """
   A abstract base class for plugins that process directives.
   """
-  def __init__(self, context):
+  def __init__(self, context, force):
     self._context = context
     self._log = Logger()
+    self.force = force
 
   def get_actions(self):
     """

@@ -11,10 +11,10 @@ class Dispatcher(object):
   """
   Dispatches tasks to loaded plugins.
   """
-  def __init__(self, dir):
+  def __init__(self, dir, force):
     self._log = Logger()
     self._setup_context(dir)
-    self._load_plugins()
+    self._load_plugins(force)
 
   def _setup_context(self, dir):
     """
@@ -53,14 +53,14 @@ class Dispatcher(object):
           self._log.error("Action \"{}\" not handled".format(action))
     return success
 
-  def _load_plugins(self):
+  def _load_plugins(self, force):
     """
     Loads all found plugins.
 
     :return: None
     """
     self._plugins = defaultdict(lambda:[])
-    for plugin in [plugin(self._context) for plugin in Plugin.__subclasses__()]:
+    for plugin in [plugin(self._context, force) for plugin in Plugin.__subclasses__()]:
       for action in plugin.get_actions():
         self._plugins[action].append(plugin)
 
